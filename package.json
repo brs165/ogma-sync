@@ -1,0 +1,13 @@
+{
+  "name": "ogma-sync",
+  "version": "1.0.0",
+  "description": "PartyKit relay server for Ogma Table multiplayer",
+  "type": "module",
+  "scripts": {
+    "deploy": "npx partykit deploy",
+    "dev": "npx partykit dev"
+  },
+  "devDependencies": {
+    "partykit": "^0.0.107"
+  }
+}
