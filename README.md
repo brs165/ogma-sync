@@ -5,7 +5,7 @@ Cloudflare Workers + Durable Objects relay server for [Ogma](https://github.com/
 ## What it does
 
 Relays real-time state between a GM's Ogma Table canvas and remote players. The GM's browser is the authoritative source of truth — this server just relays and caches the latest snapshot for late joiners. GM-only cards are filtered client-side before anything is sent.
-
+(https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/your-username/ogma)
 ## Deploy in 3 steps
 
 ### 1. Add two secrets to your GitHub repo
