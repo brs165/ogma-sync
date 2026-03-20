@@ -19,7 +19,7 @@ export class OgmaRoom {
 
     // If no GM exists yet, first connection becomes GM
     const existingGms = this.state.getWebSockets('gm');
-    const assignedRole = (role === 'gm' || existingGms.length === 0) ? 'gm' : 'player';
+    const assignedRole = (role === 'gm' && existingGms.length === 0) ? 'gm' : 'player';
 
     const [client, server] = Object.values(new WebSocketPair());
     this.state.acceptWebSocket(server, [assignedRole]);
