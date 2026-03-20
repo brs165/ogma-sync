@@ -15,7 +15,7 @@ export default class OgmaRoom {
     var role = url.searchParams.get('role');
 
     // First connection, or explicit ?role=gm claim, becomes GM
-    if (role === 'gm' || !this.gmId) {
+    if (role === 'gm' && !this.gmId) {
       this.gmId = conn.id;
       conn.setState({ role: 'gm' });
     } else {
