@@ -1,13 +1,13 @@
 {
   "name": "ogma-sync",
   "version": "1.0.0",
-  "description": "PartyKit relay server for Ogma Table multiplayer",
-  "type": "module",
+  "description": "Cloudflare Workers relay server for Ogma Table multiplayer",
+  "private": true,
   "scripts": {
-    "deploy": "npx partykit deploy",
-    "dev": "npx partykit dev"
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
   },
   "devDependencies": {
-    "partykit": "^0.0.107"
+    "wrangler": "^3.0.0"
   }
 }

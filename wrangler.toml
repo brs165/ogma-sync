@@ -1,0 +1,15 @@
+name            = "ogma-sync"
+main            = "src/worker.js"
+compatibility_date = "2024-09-23"
+
+# Durable Objects require a paid Workers plan OR the free tier with DO access
+# Cloudflare free tier includes Durable Objects as of 2024
+[durable_objects]
+bindings = [
+  { name = "OGMA_ROOM", class_name = "OgmaRoom" }
+]
+
+# Migration: tells Cloudflare to create the OgmaRoom DO class
+[[migrations]]
+tag         = "v1"
+new_classes = ["OgmaRoom"]

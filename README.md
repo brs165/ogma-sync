@@ -1,49 +1,59 @@
 # ogma-sync
 
-PartyKit relay server for [Ogma](https://github.com/brs165/ogma-fate) multiplayer sessions.
+Cloudflare Workers + Durable Objects relay server for [Ogma](https://github.com/brs165/ogma-fate) multiplayer sessions.
 
 ## What it does
 
-Relays real-time state between a GM's Ogma Table canvas and remote players. The GM's browser is the authoritative source of truth; this server is a dumb relay with a state cache for late joiners.
+Relays real-time state between a GM's Ogma Table canvas and remote players. The GM's browser is the authoritative source of truth — this server just relays and caches the latest snapshot for late joiners. GM-only cards are filtered client-side before anything is sent.
 
-- GM hosts → gets a 4-char room code
-- Players visit `run.html?room=XXXX` or the Table canvas URL with `?room=XXXX`
-- Full state syncs on every `persist()` call
-- `gmOnly` cards never leave the GM's browser (filtered client-side before sending)
+## Deploy in 3 steps
 
-## Deploy (hosted by Ogma project)
+### 1. Add two secrets to your GitHub repo
 
-The project maintains a shared instance at `sync.ogma.net`. No setup needed.
+Go to your repo → **Settings → Secrets and variables → Actions** and add:
 
-## Self-host: one click
+| Secret name | Where to find it |
+|-------------|-----------------|
+| `CLOUDFLARE_API_TOKEN` | dash.cloudflare.com → My Profile → API Tokens → Create Token → **Edit Cloudflare Workers** template |
+| `CLOUDFLARE_ACCOUNT_ID` | dash.cloudflare.com → right sidebar on any page → "Account ID" |
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/brs165/ogma-sync)
+### 2. Push to main
 
-## Self-host: manual
+The included `.github/workflows/deploy.yml` runs `wrangler deploy` automatically on every push to `main`. After the Action completes (~30 seconds) your worker is live at:
 
-```bash
-git clone https://github.com/brs165/ogma-sync
-cd ogma-sync
-npm install
-npx partykit deploy
-# → deployed to ogma-sync.<your-account>.partykit.dev
+```
+https://ogma-sync.<your-subdomain>.workers.dev
 ```
 
-Then in Ogma Settings, paste your custom URL into the **Sync Server** field.
+You can also trigger it manually: Actions tab → Deploy to Cloudflare Workers → Run workflow.
+
+### 3. Point Ogma at your server
+
+In the Ogma Table toolbar, click **⚙** (visible when not connected) and paste your worker URL. Ogma saves it to your browser preferences.
+
+## Local dev
+
+```bash
+npm install
+npx wrangler dev   # runs locally on localhost:8787
+```
 
 ## Architecture
 
 ```
-GM browser ──ws──▶ PartyKit DO ──ws──▶ Player browsers
-                  (stores latest
-                   state snapshot)
+GM browser ──ws──▶ Cloudflare DO ──ws──▶ Player browsers
+                   (stores latest
+                    state snapshot)
 ```
 
-- GM → server: `{type:"state", payload:{...}}` — stored + broadcast to players
-- Player → server: `{type:"player_action", ...}` — forwarded to GM only
-- Server → new joiner: `{type:"welcome", state:{...}}` — late join catchup
+- **GM → server:** `{type:"state", payload:{...}}` stored + broadcast to players
+- **Player → server:** `{type:"player_action", ...}` forwarded to GM only
+- **Server → new joiner:** `{type:"welcome", state:{...}}` for late-join catchup
+- **On GM disconnect:** toast broadcast to all players
 
-See [partykit-multiplayer-spec.md](https://github.com/brs165/ogma-fate/blob/main/devdocs/partykit-multiplayer-spec.md) for the full protocol.
+## Cloudflare free tier limits
+
+Durable Objects: 100,000 WebSocket message-days per month (~125 four-hour sessions). Free for most groups. See [Cloudflare pricing](https://developers.cloudflare.com/workers/platform/pricing/) for details.
 
 ## License
 
